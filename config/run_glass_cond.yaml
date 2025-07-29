@@ -1,0 +1,62 @@
+# Specify training parameters.
+defaults:
+  - dataset: mscoco
+  - hydra: default
+  - model: CLIP-ViT-B-16
+  - local: default
+  - _self_
+
+dry_run: False
+
+seed: 3407
+
+# Overwrite the default value to disable idle workers in OptBasedDataReconstructionAttack.
+workers: 0
+
+optimizer:
+  _target_: Adam
+  lr: 1.0e-2
+  betas: [0.9, 0.999]
+  weight_decay: 0
+
+scheduler:
+  _target_: null
+
+model:
+  torch_dtype: float32
+  split_points: ???
+
+defense:
+  name: null
+  target: intermediate
+  kwargs:
+    p: 0.0
+
+adaptive_attack:
+  name: null
+  target: intermediate
+  kwargs:
+    predictor: ${checkpoint_dir}/inverse_network/${model.checkpoint}/imagenet/${model.split_points}_public
+
+dataset:
+  target: 0
+
+image_prior:
+  name: StyleGAN-XL
+  checkpoint: ${checkpoint_dir}/stylegan-xl/imagenet256.pkl
+  torch_dtype: float32
+  truncation_psi: 1.0
+  class_embedding: logits # `logits` or `embedding`
+  optimize_fourier_features: false
+
+objective:
+  criterion: CosineSimilarityLoss
+  total_variation: 0.0
+  kl_divergence: 1.0
+  patch_prior: 0.0
+
+max_steps: 10000
+
+log_every_n_steps: 100
+val_check_interval: ${log_every_n_steps}
+distance_fn: CosineSimilarityLoss

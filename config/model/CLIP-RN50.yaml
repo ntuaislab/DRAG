@@ -1,0 +1,7 @@
+# choices: ['layers<n>']
+
+name: ModifiedResNet
+checkpoint: openai/RN50
+image_size: 224
+preprocess:
+  - clip_vit_processor: {}

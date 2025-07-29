@@ -1,0 +1,40 @@
+defaults:
+  - dataset: imagenet
+  - hydra: default
+  - model: CLIP-RN50
+  - local: default
+  - _self_
+
+seed: 3407
+workers: 8
+
+optimizer:
+  name: Adam
+  kwargs:
+    lr: 1.0e-2
+
+model:
+  torch_dtype: float32
+
+# np.logspace(start, end, num)
+weight_decay:
+  start: -10
+  stop: -6
+  num: 36
+
+# batch_size: 128
+
+# scheduler:
+#   name: StepLR
+#   kwargs:
+#     gamma: 0.1
+#     step_size: 32
+#     step_unit: epoch
+
+preprocess:
+  train: ${model.preprocess}
+  validation: ${model.preprocess}
+
+max_steps: 1000
+log_every_n_steps: 1000
+val_check_interval: ${log_every_n_steps}

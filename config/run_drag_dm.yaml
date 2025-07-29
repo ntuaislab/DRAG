@@ -1,0 +1,65 @@
+# Specify training parameters.
+defaults:
+  - dataset: mscoco
+  - hydra: default
+  - image_prior: lsun_bedroom
+  - model: CLIP-ViT-B-16
+  - local: default
+  - _self_
+
+dry_run: False
+
+seed: 3407
+
+# Overwrite the default value to disable idle workers in OptBasedDataReconstructionAttack.
+workers: 0
+
+optimizer: # The optimizer in DRAG is used for smoothening grad among iterations.
+  _target_: Adam
+
+model:
+  torch_dtype: float32
+  split_points: ???
+
+defense:
+  name: null
+  target: intermediate
+  kwargs:
+    p: 0.0
+
+adaptive_attack:
+  name: null
+  target: intermediate
+  kwargs:
+    predictor: ${checkpoint_dir}/inverse_network/${model.checkpoint}/imagenet/${model.split_points}_public
+
+dataset:
+  target: 0
+
+image_prior:
+  latent:
+    inversion_method: ddpm  # option: ddim/ddpm
+    init:
+      _from_: null       # option: null, 'rMLE', 'zero' or a checkpoint directory
+  max_grad_norm: 0.02
+  max_step_norm: .inf
+  repeat_interval:
+    min: -.inf
+    max: .inf
+  generate_kwargs:
+    interpolation: lerp
+    num_inference_steps: 250 # n: controls the denoise scheduler
+    num_internal_iterations: 16 # k: controls self-recurrence
+    guidance_scale: 0.0 # w: controls mu
+    guidance_rate: 0.2 # g_r: controls sigma
+    strength: 1.0 # indicate the noise level of the init latent code.
+                  # meaningless if initialized from normal distribution
+    eta: 1.0
+
+regularization:
+  penalty: 0.0
+  total_variation_x: 0.10
+  l2_regularization_x: 0.01
+
+distance_fn: CosineSimilarityLoss
+log_every_n_steps: 40

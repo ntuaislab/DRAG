@@ -1,0 +1,21 @@
+# Third-Party Licenses
+
+This project uses the following third-party packages and libraries:
+
+1. InferenceBenchmark
+
+   - License: Apache License 2.0
+   - https://github.com/aidecentralized/InferenceBenchmark/blob/main/LICENSE
+
+2. StyleGAN2-ADA
+
+   - License: NVIDIA Source Code License
+   - https://github.com/NVlabs/stylegan2-ada-pytorch/blob/main/LICENSE.txt
+
+3. StyleGAN-XL
+
+   - License: MIT License
+   - https://github.com/autonomousvision/stylegan-xl/blob/main/LICENSE.txt
+
+
+Please refer to the individual license files of each package for the full license text and terms.

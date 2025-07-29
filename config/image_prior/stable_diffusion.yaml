@@ -1,0 +1,23 @@
+name: StableDiffusionImg2ImgPipeline
+checkpoint: runwayml/stable-diffusion-v1-5
+torch_dtype: float32
+image_size:
+  - 3
+  - 512
+  - 512
+latent:
+  shape:
+    - 1
+    - 4
+    - 64
+    - 64
+generate_kwargs:
+  prompt: ''
+  negative_prompt: null
+  num_images_per_prompt: 1
+  num_inference_steps: 100
+  guidance_scale: 0.0
+  strength: 0.1
+  eta: 1.0
+preprocess:
+  - image_generator: {}

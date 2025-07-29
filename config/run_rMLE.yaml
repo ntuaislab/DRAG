@@ -1,0 +1,64 @@
+# Specify training parameters.
+defaults:
+  - dataset: mscoco
+  - hydra: default
+  - model: CLIP-ViT-B-16
+  - local: default
+  - _self_
+
+dry_run: False
+
+seed: 3407
+
+# Overwrite the default value to disable idle workers in OptBasedDataReconstructionAttack.
+workers: 0
+
+model:
+  torch_dtype: float32
+  split_points: ???
+
+defense:
+  name: null
+  target: intermediate
+  kwargs:
+    p: 0.0
+
+adaptive_attack:
+  name: null
+  target: intermediate
+  kwargs:
+    predictor: ${checkpoint_dir}/inverse_network/${model.checkpoint}/imagenet/${model.split_points}_public
+
+dataset:
+  target: 0
+
+rMLE:
+  optimizer:
+    _target_: Adam
+    lr: 5.0e-2
+    betas: [0.9, 0.999]
+    weight_decay: 0
+
+  scheduler:
+    _target_: null
+
+  parameters:
+    shape: [3, 224, 224]
+    image_shape:
+      - 3
+      - ${model.image_size} # height
+      - ${model.image_size} # width
+
+  distance_fn: CosineSimilarityLoss
+
+  gradient_clip_algorithm: 'norm'
+  gradient_clip_val: 1.0
+
+  regularization:
+    total_variation: 1.5
+    patch_prior: 0.001
+
+  max_steps: 20000
+
+log_every_n_steps: 0
+val_check_interval: 0.0

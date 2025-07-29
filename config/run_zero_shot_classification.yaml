@@ -1,0 +1,27 @@
+defaults:
+  - dataset: imagenet
+  - hydra: default
+  - local: default
+  - model: CLIP-ViT-B-16
+  - _self_
+
+seed: 3407
+
+model:
+  torch_dtype: float32
+  split_points: ???
+
+batch_size: 128
+
+# Workaround class Classification
+preprocess:
+  train:
+    - clip_vit_processor: {}
+  validation:
+    - clip_vit_processor: {}
+
+defense:
+  name: null
+  target: intermediate
+  kwargs:
+    p: 0.0

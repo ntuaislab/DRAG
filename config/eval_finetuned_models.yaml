@@ -1,0 +1,37 @@
+# Specify running parameters.
+defaults:
+  - dataset: imagenet
+  - hydra: default
+  - model: CLIP-ViT-B-16
+  - local: default
+  - _self_
+
+seed: 3407
+
+workers: -1
+
+model:
+  torch_dtype: float32
+  split_points: ???
+
+batch_size: 128
+
+# Workaround class Classification
+preprocess:
+  train:
+    - clip_vit_processor: {}
+  validation:
+    - clip_vit_processor: {}
+
+defense:
+  name: null
+  target: intermediate
+  kwargs:
+    p: 0.0
+
+adaptive_attack:
+  name: null
+  target: intermediate
+  kwargs:
+    predictor: ${oc.env:HOME}/assets/reconstructor/${model.checkpoint}/imagenet/${model.split_points}/position_predictor.pt
+    N: 196

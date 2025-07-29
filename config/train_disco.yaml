@@ -1,0 +1,47 @@
+# Specify training parameters.
+defaults:
+  - dataset: imagenet
+  - hydra: default
+  - model: CLIP-ViT-B-16
+  - local: default
+  - _self_
+
+seed: 3407
+
+workers: 8
+
+optimizer:
+  name: SGD
+  kwargs:
+    lr: 1.0e-3
+    weight_decay: 0
+
+scheduler:
+  name: null
+  kwargs: {}
+
+checkpoint:
+  save_top_k: -1
+  every_n_train_steps: 5000
+
+model:
+  torch_dtype: float32
+  split_points: ???
+  pretrained_head: ${oc.env:HOME}/assets/linear_probe/${model.checkpoint}/${dataset.name}
+
+preprocess:
+  train: ${model.preprocess}
+  validation: ${model.preprocess}
+
+batch_size: 128
+
+disco:
+  rho: 0.75 # weight of `utility` loss, following the definition in paper
+  temperature: 0.03 # Sharpness of the soft-indicator function
+  pruning_ratio: 0.0 # Number of channels to be pruned
+  use_spatial_decoupling: false # Use spatial decoupling?
+  pretrained_reconstructor: ${oc.env:HOME}/assets/reconstructor/${model.checkpoint}/${dataset.name}/${model.split_points}_private
+
+log_every_n_steps: 50
+max_steps: 50000
+val_check_interval: 2500

@@ -1,0 +1,10 @@
+name: imagenet
+
+# Specify the target attribute to predict and protect.
+kwargs: {}
+
+# Limit the number of samples to load from the dataset.
+size: null
+
+# Metadata
+n_classes: 1000

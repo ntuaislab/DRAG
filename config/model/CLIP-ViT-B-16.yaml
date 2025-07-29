@@ -1,0 +1,8 @@
+# OpenAI/CLIP-ViT, choices:
+#   ['embeddings', 'encoder_layer_<n>', 'image_embeds']
+
+name: CLIPVisionModelWithProjection
+checkpoint: openai/clip-vit-base-patch16
+image_size: 224
+preprocess:
+  - clip_vit_processor: {}

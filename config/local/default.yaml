@@ -1,0 +1,16 @@
+# @package _global_
+
+# Environment variables
+# Stores the path to the dataset and checkpoint
+
+experiment:
+  name: DataReconstruction
+  description: null
+
+checkpoint_dir: ${hydra:runtime.cwd}/checkpoints
+dataset_dir: ${hydra:runtime.cwd}/datasets
+
+tensorboard:
+  log_dir: runs
+
+workers: -1

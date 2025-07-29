@@ -1,0 +1,39 @@
+# IPython Notebook
+.ipynb_checkpoints/
+
+# Python intermediate
+__pycache__
+
+# Large files
+checkpoints
+datasets
+outputs
+
+# LMDB cache
+_cache_*
+
+# Generated files
+*.ckpt
+*.csv
+*.gif
+*.jpg
+*.json
+*.pdf
+*.png
+*.pt
+*.pth
+
+# Environment soft-links
+external
+
+# Misc
+.hypothesis
+TODO.md
+
+# Temporary files
+*.nfs*
+**.bin
+condaenv.*
+
+# MacOS
+.DS_Store

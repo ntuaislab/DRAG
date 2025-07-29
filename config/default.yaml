@@ -1,0 +1,17 @@
+defaults:
+  - dataset: imagenet
+  - hydra: default
+  - local: default
+  - _self_
+  - override hydra/hydra_logging: disabled
+  - override hydra/job_logging: disabled
+
+hydra:
+  output_subdir: null
+
+  run:
+    dir: .
+
+  sweep:
+    dir: .
+    subdir: .

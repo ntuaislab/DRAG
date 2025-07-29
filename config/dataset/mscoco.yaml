@@ -1,0 +1,8 @@
+name: mscoco
+
+# any keyword arguments for the dataset instance
+kwargs:
+  year: 2017
+
+# Limit the number of samples to load from the dataset.
+size: null

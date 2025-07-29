@@ -1,0 +1,47 @@
+# Specify training parameters.
+defaults:
+  - dataset: imagenet
+  - hydra: default
+  - model: CLIP-ViT-B-16
+  - local: default
+  - _self_
+
+seed: 3407
+
+workers: 8
+
+optimizer:
+  name: SGD
+  kwargs:
+    lr: 1.0e-4
+    weight_decay: 1.0e-4
+
+scheduler:
+  name: null
+  kwargs: {}
+
+checkpoint:
+  save_top_k: -1
+  every_n_train_steps: 5000
+
+model:
+  torch_dtype: float32
+  split_points: ???
+  pretrained_head: ${oc.env:HOME}/assets/linear_probe/${model.checkpoint}/${dataset.name}
+
+preprocess:
+  train: ${model.preprocess}
+  validation: ${model.preprocess}
+
+batch_size: 128
+
+nopeek:
+  lamda: 1 # weight of `privacy` loss, following the definition in GLASS
+  dx: euclidean
+  dz: euclidean
+
+
+log_every_n_steps: 50
+max_steps: 20000
+val_check_interval: 500
+accumulate_grad_batches: 1

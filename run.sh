@@ -49,6 +49,11 @@
 #    hydra.sweep.subdir=\${model.checkpoint}/\${dataset.name}.\${dataset.target}/\${model.split_points} \
 #    --multirun
 
+# # Run the Inverse Network only.
+# python run_detokenizer.py \
+#    +ckpt_dir=checkpoints/inverse_network/openai/clip-vit-base-patch16/imagenet/encoder_layer_12_public \
+#    +batch_size=1
+
 # # Sec 5.3.1: Distribution Shift (UCMerced LandUse)
 # # ------------------------------------------------
 # python3 run_drag_ldm.py \
@@ -166,3 +171,12 @@ python3 run_drag_ldm.py \
 #    hydra.sweep.dir=outputs/\${hydra.job.name}/droptoken_r-\${defense.kwargs.p}_reorder \
 #    hydra.sweep.subdir=\${model.checkpoint}/\${dataset.name}.\${dataset.target}/\${model.split_points} \
 #    --multirun
+
+
+# # Miscellaneous
+# # -------------
+# # Train an inverse network.
+# python train_detokenizer.py \
+#    model=DINOv2-Base \
+#    model.split_points=encoder_layer_9 \
+#    workers=8

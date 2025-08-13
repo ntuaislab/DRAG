@@ -27,6 +27,7 @@ from models.distance import dino_image_similarity
 from .base import VAL, Metric
 from .data_reconstruction import (LearningBasedDRA, ReconstructionMetric,
                                   apply_adaptive_attack, apply_defense)
+from .data_reconstruction.defense import _reorder_tokens
 from .utils import create_optimizer, create_scheduler, flatten_dictionary
 
 
@@ -78,7 +79,7 @@ class DetokenizationRunner(LearningBasedDRA):
 
     def load_checkpoint(self, dirname: str | Path):
         dirname = Path(dirname) / 'last.ckpt'
-        state_dict = torch.load(dirname, map_location=self.device)['state_dict']
+        state_dict = torch.load(dirname, map_location=self.device, weights_only=False)['state_dict']
 
         self.reconstructor.load_state_dict({
             k.replace('reconstructor.', ''): v
@@ -165,67 +166,55 @@ class DetokenizationRunner(LearningBasedDRA):
         Metric
             Evaluation metric.
         """
+        device = self.device
+
         self.metric.reset()
 
-        num_patch_per_row = self._image_size // self._patch_size
-        x = torch.arange(0, num_patch_per_row)
-        y = torch.arange(0, num_patch_per_row)
+        P = self._image_size // self._patch_size # num of patches per side
+        x = torch.arange(0, P)
+        y = torch.arange(0, P)
         x, y = torch.meshgrid(x, y, indexing='ij')
-        coordinates = torch.stack((x, y), dim=-1).unsqueeze(0).to(self.rank)
+        coordinates = torch.stack((x, y), dim=-1).unsqueeze(0).to(self.device)
 
-        accuracy = MulticlassAccuracy(
-            1 + (self._image_size // self._patch_size) ** 2
-        ).to(self.device)
-
-        # defense = self.configs.get('defense', DictConfig({ 'name': None, 'target': None, 'kwargs': {} }))
-        # self.logger.info('Defense: %s(%s) (%s)', defense.name, defense.target, defense.kwargs)
-
-        # adaptive_attack = self.configs.get('adaptive_attack', DictConfig({ 'name': None, 'kwargs': {} }))
-        # self.logger.info('Adaptive attack: %s (%s)', adaptive_attack.name, adaptive_attack.kwargs)
+        accuracy = MulticlassAccuracy(1 + P ** 2).to(self.device)
 
         position_err = 0
-        device = self.device
         dataloader = self.dataloader[VAL]
-        pbar = tqdm(dataloader, ncols=0, desc='Evaluating...', disable=self.rank != 0)
+        pbar = tqdm(dataloader, ncols=0, desc='Evaluating...')
         for img, *_ in pbar:
             img = img.to(device)
 
-            # encode the image to intermediate representations
             intermediate_repr: Tensor = self.client_model(img)
+            batch_size, num_tokens, _ = intermediate_repr.size()
 
-            batch_size = intermediate_repr.size(0)
-            num_tokens = intermediate_repr.size(1)
-
-            # Use post-processing defense if specified.
-            p1 = torch.arange(num_tokens, device=self.rank)
-            p2 = torch.argmax(self.position_predictor(intermediate_repr)[:, 1:, 1:], dim=-1)
-            # _, p2 = _reorder_tokens(intermediate_repr, None, self.position_predictor, output_permutation=True)
-            # _, p2 = _, p2.reshape(batch_size, -1)[:, 1:] - 1
-
-            # predict the patch pixels and measure the performance in [0, 1] domain
+            #region Reconstruction Loss (NOT considering token shuffling)
             img_pred = self.generate(intermediate_repr)
 
-            # measure the coordinate prediction result with k-class classification
-            coordinates_pred = p2
-
-            accuracy.update(p2, torch.arange(num_tokens - 1, device=self.rank).expand(batch_size, -1))
-
-            # decode the classification result to coordinate (i, j)
-            row_index = (coordinates_pred // num_patch_per_row).reshape(batch_size, num_patch_per_row, num_patch_per_row) \
-                                                               .unsqueeze(-1)
-            col_index = (coordinates_pred % num_patch_per_row).reshape(batch_size, num_patch_per_row, num_patch_per_row) \
-                                                              .unsqueeze(-1)
-            coordinates_pred = torch.cat((row_index, col_index), dim=-1)
-
-            err = (coordinates_pred - coordinates).float().norm(dim=-1, p=1).mean(dim=(1, 2)).sum()
-            position_err += err.item()
-
-            # resize the image
             img = F.resize(img, [self._image_size, self._image_size], antialias=True)
             img = self.client_unnormalizer(img).clamp(0, 1)
             img_pred = self.client_unnormalizer(img_pred).clamp(0, 1)
 
             self.metric.update(img_pred, img)  # pylint: disable=not-callable
+
+            #region Token prediction
+
+            # Option 1: Individual patch position prediction
+            # p2 = self.position_predictor(intermediate_repr)[:, 1:, 1:].argmax(dim=-1)
+
+            # Option 2: Maximize bipartite matching
+            _, p2 = _reorder_tokens(intermediate_repr, None, self.position_predictor, output_permutation=True)
+            p2 = p2.reshape(batch_size, -1)[:, 1:] - 1
+
+            # measure the coordinate prediction result with k-class classification
+            accuracy.update(p2, torch.arange(num_tokens - 1, device=self.device).expand(batch_size, -1))
+
+            # decode the classification result to coordinate (i, j)
+            row_index = (p2 // P).reshape(batch_size, P, P).unsqueeze(-1)
+            col_index = (p2 % P).reshape(batch_size, P, P).unsqueeze(-1)
+            p2 = torch.cat((row_index, col_index), dim=-1)
+
+            err = (p2 - coordinates).float().norm(dim=-1, p=1).mean(dim=(1, 2)).sum()
+            position_err += err.item()
 
         position_err /= len(dataloader.dataset) # type: ignore
         metric = self.metric.compute() | {

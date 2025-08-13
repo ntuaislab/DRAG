@@ -32,14 +32,6 @@ from runner.utils import default_num_workers
 
 
 class DetokenizationTrainer(DetokenizationRunner):
-    @property
-    def _create_checkpoint_folder(self) -> bool:
-        return True
-
-    @property
-    def _create_writer(self) -> bool:
-        return False
-
     def run(self) -> None:
         self._prepare_dataset()
         self._prepare_model()

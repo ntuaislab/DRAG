@@ -55,7 +55,7 @@ def main(config: DictConfig) -> None:
     task.load_checkpoint(config.ckpt_dir)
 
     # Standard evaluation
-    task.metric = ReconstructionMetric(**dino_image_similarity()).to(task.rank)
+    task.metric = ReconstructionMetric(**dino_image_similarity()).to(task.device)
     metric = task.evaluate()
     metric = pd.Series(metric)
     metric.to_json(Path(config.ckpt_dir) / 'metric.json', indent=4)
@@ -67,18 +67,18 @@ def main(config: DictConfig) -> None:
     if (targets := config.dataset.get('target', None)) is None:
         return
 
-    root = Path('external') / 'outputs' / '00.inverse_network'
+    root = Path('outputs') / 'inverse_network'
     root.mkdir(exist_ok=True, parents=True)
     dataset = task.dataloader[VAL].dataset
     for target, (img, *_) in tqdm(zip(targets, dataset)):
-        img = img.to(task.rank).unsqueeze(0)
+        img = img.to(task.device).unsqueeze(0)
 
         intermediate_repr = task.client_model(img)
         img_pred = task.generate(intermediate_repr)
         img_pred = CLIP_IMG_UNNORMALIZE(img_pred).clamp(0, 1)
 
         # Create the output directory
-        outdir = root / origin.model.checkpoint / 'baseline' / f'dataset-{origin.dataset.size:06d}' / f'{origin.dataset.name}.{target}' / origin.model.split_points
+        outdir = root / origin.model.checkpoint / f'{origin.dataset.name}.{target}' / origin.model.split_points
         outdir.mkdir(exist_ok=True, parents=True)
         (outdir / '.hydra').mkdir(exist_ok=True)
 

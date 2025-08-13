@@ -27,7 +27,7 @@ checkpoint:
 model:
   torch_dtype: float32
   split_points: ???
-  pretrained_head: ${oc.env:HOME}/assets/linear_probe/${model.checkpoint}/${dataset.name}
+  pretrained_head: ${checkpoint_dir}/linear_probe/${model.checkpoint}/${dataset.name}
 
 preprocess:
   train: ${model.preprocess}
@@ -40,7 +40,7 @@ disco:
   temperature: 0.03 # Sharpness of the soft-indicator function
   pruning_ratio: 0.0 # Number of channels to be pruned
   use_spatial_decoupling: false # Use spatial decoupling?
-  pretrained_reconstructor: ${oc.env:HOME}/assets/reconstructor/${model.checkpoint}/${dataset.name}/${model.split_points}_private
+  pretrained_reconstructor: ${checkpoint_dir}/inverse_network/${model.checkpoint}/${dataset.name}/${model.split_points}_private
 
 log_every_n_steps: 50
 max_steps: 50000

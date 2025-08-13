@@ -27,7 +27,7 @@ checkpoint:
 model:
   torch_dtype: float32
   split_points: ???
-  pretrained_head: ${oc.env:HOME}/assets/linear_probe/${model.checkpoint}/${dataset.name}
+  pretrained_head: ${checkpoint_dir}/linear_probe/${model.checkpoint}/${dataset.name}
 
 preprocess:
   train: ${model.preprocess}

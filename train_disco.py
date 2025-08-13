@@ -23,10 +23,10 @@ import torch
 from lightning.pytorch.callbacks import ModelCheckpoint
 from lightning.pytorch.loggers import TensorBoardLogger
 from omegaconf import DictConfig, OmegaConf
-from torch import Tensor, nn
+from torch import nn
 from torch.utils.data import DataLoader, random_split
 
-from models import create_model, split_model
+from models import create_model
 from models.clip_classifier import ClientAdapter, ServerAdapter
 from models.detokenizer import Detokenizer
 from models.split_network import Splittable
@@ -36,7 +36,7 @@ from runner.base import TRAIN, VAL
 from runner.classifier import ClassifierRunner
 from runner.disco import LitDisco
 from runner.model_repo import detokenizer
-from runner.utils import flatten_dictionary, parse_torch_dtype
+from runner.utils import parse_torch_dtype
 
 
 def prediction_head(ckpt_dir: str | Path) -> nn.Linear:
@@ -101,10 +101,6 @@ class DiscoTrainer(ClassifierRunner):
     """ Trainer for the classification task, w/ privacy defense. """
     pipe: L.LightningModule
     reconstructor: Detokenizer
-
-    @property
-    def _create_checkpoint_folder(self) -> bool:
-        return True
 
     def _prepare_dataset(self, **kwargs) -> None:
         super()._prepare_dataset(**kwargs)

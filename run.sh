@@ -9,32 +9,32 @@
 # Models: (check config/model)
 #  CLIP-ViT-B-16, CLIP-RN50, DINOv2-Base
 
-# python3 run_drag_ldm.py \
-#    dataset=mscoco \
-#    dataset.target=119,138,725,1044,1703,1919,2111,2591,4111,4497 \
-#    model=CLIP-ViT-B-16 \
-#    model.split_points=encoder_layer_12 \
-#    hydra.sweep.dir=outputs/\${hydra.job.name}/baseline \
-#    hydra.sweep.subdir=\${model.checkpoint}/\${dataset.name}.\${dataset.target}/\${model.split_points} \
-#    --multirun
+python3 run_drag_ldm.py \
+   dataset=mscoco \
+   dataset.target=119,138,725,1044,1703,1919,2111,2591,4111,4497 \
+   model=CLIP-ViT-B-16 \
+   model.split_points=encoder_layer_12 \
+   hydra.sweep.dir=outputs/\${hydra.job.name}/baseline \
+   hydra.sweep.subdir=\${model.checkpoint}/\${dataset.name}.\${dataset.target}/\${model.split_points} \
+   --multirun
 
-# python3 run_drag_ldm.py \
-#    dataset=ffhq \
-#    dataset.target=337,429,1729,1917,2890,4919,6044,7532,8223,9399 \
-#    model=CLIP-ViT-B-16 \
-#    model.split_points=encoder_layer_12 \
-#    hydra.sweep.dir=outputs/\${hydra.job.name}/baseline \
-#    hydra.sweep.subdir=\${model.checkpoint}/\${dataset.name}.\${dataset.target}/\${model.split_points} \
-#    --multirun
+python3 run_drag_ldm.py \
+   dataset=ffhq \
+   dataset.target=337,429,1729,1917,2890,4919,6044,7532,8223,9399 \
+   model=CLIP-ViT-B-16 \
+   model.split_points=encoder_layer_12 \
+   hydra.sweep.dir=outputs/\${hydra.job.name}/baseline \
+   hydra.sweep.subdir=\${model.checkpoint}/\${dataset.name}.\${dataset.target}/\${model.split_points} \
+   --multirun
 
-# python3 run_drag_ldm.py \
-#    dataset=imagenet \
-#    dataset.target=6091,11341,16904,17849,24681,28026,36044,36293,37807,49165 \
-#    model=CLIP-ViT-B-16 \
-#    model.split_points=encoder_layer_12 \
-#    hydra.sweep.dir=outputs/\${hydra.job.name}/baseline \
-#    hydra.sweep.subdir=\${model.checkpoint}/\${dataset.name}.\${dataset.target}/\${model.split_points} \
-#    --multirun
+python3 run_drag_ldm.py \
+   dataset=imagenet \
+   dataset.target=6091,11341,16904,17849,24681,28026,36044,36293,37807,49165 \
+   model=CLIP-ViT-B-16 \
+   model.split_points=encoder_layer_12 \
+   hydra.sweep.dir=outputs/\${hydra.job.name}/baseline \
+   hydra.sweep.subdir=\${model.checkpoint}/\${dataset.name}.\${dataset.target}/\${model.split_points} \
+   --multirun
 
 # # Sec 5.2: Enhancing DRAG with Inverse Networks
 # # ---------------------------------------------
@@ -82,56 +82,53 @@
 # Sec 5.4: Reconstruction from Privacy-Guarded Models
 # ---------------------------------------------------
 # DISCO:
-python3 run_drag_ldm.py \
-   dataset=mscoco \
-   dataset.target=119,138,725,1044,1703,1919,2111,2591,4111,4497 \
-   model=CLIP-ViT-B-16 \
-   model.split_points=encoder_layer_12 \
-   +defender="disco_\${disco}" \
-   +disco=rho-0.95_r-0.1,rho-0.75_r-0.2,rho-0.95_r-0.5 \
-   defense.name="channel_pruning" \
-   "~defense.kwargs.p" \
-   +defense.kwargs.pruner="\${model.checkpoint}" \
-   +model._checkpoint=openai/clip-vit-base-patch16 \
-   model.checkpoint="\${checkpoint_dir}/disco/\${model._checkpoint}/\${model.split_points}/\${disco}" \
-   hydra.sweep.dir=outputs/\${hydra.job.name} \
-   hydra.sweep.subdir=\${defender}/\${distance_fn}/\${model._checkpoint}/\${dataset.name}.\${dataset.target}/\${model.split_points} \
-   --multirun
+# python3 run_drag_ldm.py \
+#    dataset=mscoco \
+#    dataset.target=119,138,725,1044,1703,1919,2111,2591,4111,4497 \
+#    model=CLIP-ViT-B-16 \
+#    model.split_points=encoder_layer_12 \
+#    +defender="disco_\${disco}" \
+#    +disco=rho-0.95_r-0.1,rho-0.75_r-0.2,rho-0.95_r-0.5 \
+#    defense.name="channel_pruning" \
+#    "~defense.kwargs.p" \
+#    +defense.kwargs.pruner="\${model.checkpoint}" \
+#    +model._checkpoint=openai/clip-vit-base-patch16 \
+#    model.checkpoint="\${checkpoint_dir}/disco/\${model._checkpoint}/\${model.split_points}/\${disco}" \
+#    hydra.sweep.dir=outputs/\${hydra.job.name} \
+#    hydra.sweep.subdir=\${defender}/\${distance_fn}/\${model._checkpoint}/\${dataset.name}.\${dataset.target}/\${model.split_points} \
+#    --multirun
 
 # DISCO (Adaptive Attack):
-python3 run_drag_ldm.py \
-   dataset=mscoco \
-   dataset.target=119,138,725,1044,1703,1919,2111,2591,4111,4497 \
-   model=CLIP-ViT-B-16 \
-   model.split_points=encoder_layer_12 \
-   +defender="disco_\${disco}" \
-   +disco=rho-0.95_r-0.1,rho-0.75_r-0.2,rho-0.95_r-0.5 \
-   defense.name="channel_pruning" \
-   "~defense.kwargs.p" \
-   +defense.kwargs.pruner="\${model.checkpoint}" \
-   +model._checkpoint=openai/clip-vit-base-patch16 \
-   model.checkpoint="\${checkpoint_dir}/disco/\${model._checkpoint}/\${model.split_points}/\${disco}" \
-   distance_fn=AdaptiveCosineSimilarityLoss \
-   hydra.sweep.dir=outputs/\${hydra.job.name} \
-   hydra.sweep.subdir=\${defender}/\${distance_fn}/\${model._checkpoint}/\${dataset.name}.\${dataset.target}/\${model.split_points} \
-   --multirun
+# python3 run_drag_ldm.py \
+#    dataset=mscoco \
+#    dataset.target=119,138,725,1044,1703,1919,2111,2591,4111,4497 \
+#    model=CLIP-ViT-B-16 \
+#    model.split_points=encoder_layer_12 \
+#    +defender="disco_\${disco}" \
+#    +disco=rho-0.95_r-0.1,rho-0.75_r-0.2,rho-0.95_r-0.5 \
+#    defense.name="channel_pruning" \
+#    "~defense.kwargs.p" \
+#    +defense.kwargs.pruner="\${model.checkpoint}" \
+#    +model._checkpoint=openai/clip-vit-base-patch16 \
+#    model.checkpoint="\${checkpoint_dir}/disco/\${model._checkpoint}/\${model.split_points}/\${disco}" \
+#    distance_fn=AdaptiveCosineSimilarityLoss \
+#    hydra.sweep.dir=outputs/\${hydra.job.name} \
+#    hydra.sweep.subdir=\${defender}/\${distance_fn}/\${model._checkpoint}/\${dataset.name}.\${dataset.target}/\${model.split_points} \
+#    --multirun
 
 # NoPeek:
-python3 run_drag_ldm.py \
-   dataset=mscoco \
-   dataset.target=119,138,725,1044,1703,1919,2111,2591,4111,4497 \
-   model=CLIP-ViT-B-16 \
-   model.split_points=encoder_layer_12 \
-   +defender="nopeek_lambda-\${nopeek}_dz-cosine" \
-   +nopeek=1.0,3.0,5.0 \
-   defense.name="channel_pruning" \
-   "~defense.kwargs.p" \
-   +defense.kwargs.pruner="\${model.checkpoint}" \
-   +model._checkpoint=openai/clip-vit-base-patch16 \
-   model.checkpoint="\${checkpoint_dir}/nopeek/\${model._checkpoint}/\${model.split_points}/lambda_\${nopeek}_dz_cosine" \
-   hydra.sweep.dir=outputs/\${hydra.job.name} \
-   hydra.sweep.subdir=\${defender}/\${model._checkpoint}/\${dataset.name}.\${dataset.target}/\${model.split_points} \
-   --multirun
+# python3 run_drag_ldm.py \
+#    dataset=mscoco \
+#    dataset.target=119,138,725,1044,1703,1919,2111,2591,4111,4497 \
+#    model=CLIP-ViT-B-16 \
+#    model.split_points=encoder_layer_12 \
+#    +defender="nopeek_lambda-\${nopeek}_dz-cosine" \
+#    +nopeek=1.0,3.0,5.0 \
+#    +model._checkpoint=openai/clip-vit-base-patch16 \
+#    model.checkpoint="\${checkpoint_dir}/nopeek/\${model._checkpoint}/\${model.split_points}/lambda_\${nopeek}_dz_cosine" \
+#    hydra.sweep.dir=outputs/\${hydra.job.name} \
+#    hydra.sweep.subdir=\${defender}/\${model._checkpoint}/\${dataset.name}.\${dataset.target}/\${model.split_points} \
+#    --multirun
 
 
 # # Sec 5.5: Token Shuffling (and Dropping) Defense
@@ -180,3 +177,15 @@ python3 run_drag_ldm.py \
 #    model=DINOv2-Base \
 #    model.split_points=encoder_layer_9 \
 #    workers=8
+
+# # Fine-tune a model with DISCO Protection.
+# python train_disco.py \
+#    model.split_points=encoder_layer_12 \
+#    disco.rho=0.75 \
+#    disco.pruning_ratio=0.2
+
+# # Fine-tune a model with NoPeek Protection.
+# python train_nopeek.py \
+#    model.split_points=encoder_layer_12 \
+#    nopeek.lamda=1.0 \
+#    nopeek.dz=cosine

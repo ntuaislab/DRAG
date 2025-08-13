@@ -39,10 +39,6 @@ class NoPeekTrainer(ClassifierRunner):
     """ Trainer for the classification task, w/ privacy defense. """
     pipe: L.LightningModule
 
-    @property
-    def _create_checkpoint_folder(self) -> bool:
-        return True
-
     def _prepare_dataset(self, **kwargs) -> None:
         super()._prepare_dataset(**kwargs)
 

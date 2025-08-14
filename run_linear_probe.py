@@ -31,7 +31,9 @@ class LitClassificationHead(LitSplitClassifierBase):
         super().__init__()
 
         self.fc = fc
-        self._metric = MulticlassAccuracy(num_classes=fc.out_features) # type: ignore
+        self._metric = MulticlassAccuracy(
+            num_classes=fc.out_features, average="micro",
+        ) # type: ignore
 
     def unwrap(self) -> nn.Linear:
         return self.fc

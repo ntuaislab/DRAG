@@ -4,6 +4,10 @@ run_zero_shot_classification.py
 Eval zero-shot classification on CLIP models, support defenses.
 """
 
+import os;
+
+os.environ['TOKENIZERS_PARALLELISM'] = 'false'
+
 import json
 from pathlib import Path
 from typing import Callable
@@ -44,6 +48,7 @@ class LitAdapter(L.LightningModule):
         self._defense = defense
         self._metric: Metric = MulticlassAccuracy(
             num_classes=self._head.out_features,
+            average='micro',
         )
 
     def test_step(self, batch, batch_idx) -> STEP_OUTPUT:

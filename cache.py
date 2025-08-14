@@ -155,7 +155,7 @@ dataset:
     for im, label in tqdm(dataloader, desc=f'{dataset_config.name}{idx:02d}', ncols=0):
         im = im.to(device)
         bs = im.size(0)
-        f[start:start+bs] = model(im)
+        f[start:start+bs] = model(im).image_embeds
         Y[start:start+bs] = label
         start += bs
 

@@ -69,7 +69,7 @@ class LitNoPeek(LitSplitClassifierBase):
         self._config = config
         self._client = client
         self._server = server
-        self._metric = MulticlassAccuracy(num_classes=num_classes) # type: ignore
+        self._metric = MulticlassAccuracy(num_classes=num_classes, average="micro") # type: ignore
 
     def unwrap(self) -> NoPeekForClassification:
         return NoPeekForClassification(self._client, self._server)

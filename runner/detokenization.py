@@ -176,7 +176,7 @@ class DetokenizationRunner(LearningBasedDRA):
         x, y = torch.meshgrid(x, y, indexing='ij')
         coordinates = torch.stack((x, y), dim=-1).unsqueeze(0).to(self.device)
 
-        accuracy = MulticlassAccuracy(1 + P ** 2).to(self.device)
+        accuracy = MulticlassAccuracy(1 + P ** 2, average="micro").to(self.device)
 
         position_err = 0
         dataloader = self.dataloader[VAL]

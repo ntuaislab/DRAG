@@ -41,6 +41,7 @@ class LitAdapter(L.LightningModule):
         self._defense = defense
         self._metric: Metric = MulticlassAccuracy(
             num_classes=self._server.visual_projection.out_features,
+            average="micro",
         )
 
     def forward(self, x: Tensor) -> Tensor:

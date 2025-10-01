@@ -1,6 +1,5 @@
 # DRAG: Data Reconstruction Attack using Guided Diffusion
 
-![](https://badgen.net/github/license/ntuaislab/DRAG)
 [![arXiv](https://img.shields.io/badge/arXiv-2509.11724-b31b1b.svg)](https://www.arxiv.org/abs/2509.11724)
 
 ## [ArXiv](https://www.arxiv.org/abs/2509.11724) | [Poster & Slides](https://icml.cc/virtual/2025/poster/43496)

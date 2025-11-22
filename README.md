@@ -11,7 +11,15 @@
 We provided dependencies in conda for reproducing.
 
 ```bash
+# 1. Modify environment name inside file `environment.yml`.
+# 2. Create conda env based on the YAML file.
 conda create -f environment.yml
+
+# 3. Activate conda env
+conda activate ENVIRONMENT
+
+# 4. Install others packages from pip
+pip install -r requirements.txt
 ```
 
 Extra dependencies: CUDA, which is for compiling plugin for StyleGAN2-ADA, which is not a necessary part for our diffusion based attacks.

@@ -8,12 +8,22 @@
 
 ### Environment
 
-We provided dependencies in conda for reproducing.
+We manage dependencies with [uv](https://docs.astral.sh/uv/). `uv.lock` pins the exact versions we used (Python 3.12, PyTorch 2.5.1 with CUDA 12.4).
+
+```bash
+# 1. Create `.venv` from the lockfile.
+uv sync
+
+# 2. Run scripts inside the environment.
+uv run python run_drag_ldm.py ...
+```
+
+Alternatively, reproduce the original conda environment:
 
 ```bash
 # 1. Modify environment name inside file `environment.yml`.
 # 2. Create conda env based on the YAML file.
-conda create -f environment.yml
+conda env create -f environment.yml
 
 # 3. Activate conda env
 conda activate ENVIRONMENT

@@ -37,3 +37,6 @@ condaenv.*
 
 # MacOS
 .DS_Store
+
+# uv virtual environment
+.venv
